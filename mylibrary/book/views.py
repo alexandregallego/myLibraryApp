@@ -35,3 +35,10 @@ def new(request):
         'form': form,
         'book': 'New book',
     })
+
+
+@login_required
+def delete(request, pk):
+    book = get_object_or_404(Book, pk=pk, created_by=request.user)
+    book.delete()
+    return redirect('dashboard:index')
