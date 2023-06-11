@@ -27,3 +27,24 @@ class NewBookForm(forms.ModelForm):
                 'class': INPUT_CLASSES
             })
         }
+
+
+class EditBookForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        fields = ('name', 'description', 'price', 'image',)
+
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': INPUT_CLASSES
+            }),
+            'description': forms.Textarea(attrs={
+                'class': INPUT_CLASSES
+            }),
+            'price': forms.TextInput(attrs={
+                'class': INPUT_CLASSES
+            }),
+            'image': forms.FileInput(attrs={
+                'class': INPUT_CLASSES
+            })
+        }

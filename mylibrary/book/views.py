@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Book
-from .forms import NewBookForm
+from .forms import NewBookForm, EditBookForm
 
 # Create your views here.
 
@@ -42,3 +42,23 @@ def delete(request, pk):
     book = get_object_or_404(Book, pk=pk, created_by=request.user)
     book.delete()
     return redirect('dashboard:index')
+
+
+@login_required
+def edit(request, pk):
+    book = get_object_or_404(Book, pk=pk, created_by=request.user)
+    if request.method == 'POST':
+        form = EditBookForm(request.POST, request.FILES, instance=book)
+
+        if form.is_valid():
+            # If you try to save to the database now, the created_by field is not added. Therefore we will get an error and set commit=False
+            form.save()
+
+            return redirect('book:detail', pk=book.id)
+    else:
+        form = EditBookForm(instance=book)
+
+    return render(request, 'book/form.html', {
+        'form': form,
+        'book': 'Edit book',
+    })
