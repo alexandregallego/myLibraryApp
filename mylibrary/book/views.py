@@ -1,15 +1,38 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Book
+from django.db.models import Q
+from .models import Book, Category
 from .forms import NewBookForm, EditBookForm
 
 # Create your views here.
+
+
+def books(request):
+    query = request.GET.get('query', '')
+    category_id = request.GET.get('category', 0)
+    categories = Category.objects.all()
+    books = Book.objects.all()
+
+    if category_id:
+        books = books.filter(category_id=category_id)
+
+    if query:
+        books = books.filter(Q(name__icontains=query) |
+                             Q(description__icontains=query))
+
+    return render(request, 'book/books.html', {
+        'books': books,
+        'query': query,
+        'categories': categories,
+        'category_id': int(category_id),
+    })
 
 
 def detail(request, pk):
     book = get_object_or_404(Book, pk=pk)
     related_books = Book.objects.filter(
         category=book.category).exclude(pk=pk)
+
     return render(request, 'book/detail.html', {
         'book': book,
         'related_books': related_books
